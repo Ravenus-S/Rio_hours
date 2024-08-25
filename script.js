@@ -1,120 +1,95 @@
 document.getElementById('hoursForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const date = document.getElementById('date').value;
-    const foodSales = parseFloat(document.getElementById('foodSales').value);
+    // Get total food sales
+    const foodSales = parseFloat(document.getElementById('foodSales').value) || 0;
 
+    // Get hours worked by barbecue workers
     const barbecueWorkers = {
-        Mariana: parseFloat(document.getElementById('hoursMariana').value) || 0,
-        Lucas: parseFloat(document.getElementById('hoursLucas').value) || 0,
-        Filipe: parseFloat(document.getElementById('hoursFilipe').value) || 0,
-        Antonio: parseFloat(document.getElementById('hoursAntonio').value) || 0,
-        Fernando: parseFloat(document.getElementById('hoursFernando').value) || 0,
-        Marco: parseFloat(document.getElementById('hoursMarco').value) || 0,
-        Dani: parseFloat(document.getElementById('hoursDani').value) || 0
+        Mariana: getValueOrDefault('hoursMariana'),
+        Lucas: getValueOrDefault('hoursLucas'),
+        Filipe: getValueOrDefault('hoursFilipe'),
+        Antonio: getValueOrDefault('hoursAntonio'),
+        Fernando: getValueOrDefault('hoursFernando'),
+        Marco: getValueOrDefault('hoursMarco'),
+        Dani: getValueOrDefault('hoursDani')
     };
 
+    // Get hours worked by kitchen workers
     const kitchenWorkers = {
-        Sidney: parseFloat(document.getElementById('hoursSidney').value) || 0,
-        Jamile: parseFloat(document.getElementById('hoursJamile').value) || 0,
-        Ana: parseFloat(document.getElementById('hoursAna').value) || 0,
-        Talita: parseFloat(document.getElementById('hoursTalita').value) || 0,
-        Alfonso: parseFloat(document.getElementById('hoursAlfonso').value) || 0,
-        LucasKitchen: parseFloat(document.getElementById('hoursLucasKitchen').value) || 0,
-        MarcoKitchen: parseFloat(document.getElementById('hoursMarcoKitchen').value) || 0
+        Sidney: getValueOrDefault('hoursSidney'),
+        Jamile: getValueOrDefault('hoursJamile'),
+        Ana: getValueOrDefault('hoursAna'),
+        Talita: getValueOrDefault('hoursTalita'),
+        Alfonso: getValueOrDefault('hoursAlfonso'),
+        LucasKitchen: getValueOrDefault('hoursLucasKitchen'),
+        MarcoKitchen: getValueOrDefault('hoursMarcoKitchen')
     };
 
-    fetch('/submit-hours', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ date, foodSales, barbecue: barbecueWorkers, kitchen: kitchenWorkers })
-    })
-    .then(response => response.text())
-    .then(data => {
-        alert(data);
-        const startOfWeek = getStartOfWeek(date);
-        fetchWeeklyHours(startOfWeek);
-    })
-    .catch(error => {
-        console.error('Error submitting hours:', error);
-    });
+    // Calculate total hours for barbecue and kitchen workers
+    const totalBarbecueHours = sumHours(barbecueWorkers);
+    const totalKitchenHours = sumHours(kitchenWorkers);
+
+    // Calculate tip percentages
+    const barbecueTipPool = foodSales * 0.045;
+    const kitchenTipPool = foodSales * 0.035;
+
+    // Calculate individual earnings
+    const barbecueEarnings = calculateEarnings(barbecueWorkers, totalBarbecueHours, barbecueTipPool);
+    const kitchenEarnings = calculateEarnings(kitchenWorkers, totalKitchenHours, kitchenTipPool);
+
+    // Update the summary on the page
+    updateSummary(barbecueEarnings, kitchenEarnings);
 });
 
-window.onload = function() {
-    const today = new Date().toISOString().split('T')[0];
-    const startOfWeek = getStartOfWeek(today);
-    fetchWeeklyHours(startOfWeek);
-};
-
-function getStartOfWeek(date) {
-    return date;
+function getValueOrDefault(elementId) {
+    const element = document.getElementById(elementId);
+    return element ? parseFloat(element.value) || 0 : 0;
 }
 
-function fetchWeeklyHours(startOfWeek) {
-    fetch(`/weekly-hours?startOfWeek=${startOfWeek}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Received data:', data);
-            console.log('Type of totalSales:', typeof data.totalSales);
-            if (!Array.isArray(data.hours)) {
-                throw new Error('Invalid data format for hours');
-            }
-            if (typeof data.totalSales !== 'number' || isNaN(data.totalSales)) {
-                data.totalSales = 0;
-                console.warn('Invalid totalSales received, defaulting to 0.');
-            }
-            updateSummary(data.hours, data.totalSales);
-        })
-        .catch(error => {
-            console.error('Error fetching weekly hours:', error);
-        });
+function sumHours(workers) {
+    return Object.values(workers).reduce((total, hours) => total + hours, 0);
 }
 
-function updateSummary(workersData, totalFoodSales) {
+function calculateEarnings(workers, totalHours, tipPool) {
+    const earnings = {};
+    for (const worker in workers) {
+        const hours = workers[worker];
+        earnings[worker] = (hours / totalHours) * tipPool;
+    }
+    return earnings;
+}
+
+function updateSummary(barbecueEarnings, kitchenEarnings) {
     const summaryElement = document.getElementById('summary');
     summaryElement.innerHTML = '';
 
-    if (!Array.isArray(workersData) || workersData.length === 0) {
-        summaryElement.innerHTML = '<p>No data available for the selected week.</p>';
-        return;
-    }
-
-    const barbecueWorkers = workersData.filter(worker => worker.role === 'barbecue');
-    const kitchenWorkers = workersData.filter(worker => worker.role === 'kitchen');
-
-    const totalBarbecueHours = barbecueWorkers.reduce((acc, worker) => acc + worker.totalHours, 0);
-    const totalKitchenHours = kitchenWorkers.reduce((acc, worker) => acc + worker.totalHours, 0);
-
-    const barbecueRate = totalBarbecueHours > 0 ? (totalFoodSales * 0.045 / totalBarbecueHours) : 0;
-    const kitchenRate = totalKitchenHours > 0 ? (totalFoodSales * 0.035 / totalKitchenHours) : 0;
-
+    // Barbecue workers summary
     const barbecueSummary = document.createElement('div');
     barbecueSummary.innerHTML = `<h3 class="text-xl font-semibold text-gray-700">Barbecue Workers</h3>`;
-    barbecueSummary.innerHTML += `<p>Hourly Rate: $${barbecueRate.toFixed(2)}/hour</p>`;
-    barbecueWorkers.forEach(worker => {
-        const earnings = (worker.totalHours * barbecueRate).toFixed(2);
-        barbecueSummary.innerHTML += `<p>${worker.worker}: ${worker.totalHours} hours, $${earnings} earned</p>`;
-    });
+    for (const worker in barbecueEarnings) {
+        barbecueSummary.innerHTML += `<p>${worker}: $${barbecueEarnings[worker].toFixed(2)} earned</p>`;
+    }
     summaryElement.appendChild(barbecueSummary);
 
+    // Kitchen workers summary
     const kitchenSummary = document.createElement('div');
     kitchenSummary.innerHTML = `<h3 class="text-xl font-semibold text-gray-700">Kitchen Workers</h3>`;
-    kitchenSummary.innerHTML += `<p>Hourly Rate: $${kitchenRate.toFixed(2)}/hour</p>`;
-    kitchenWorkers.forEach(worker => {
-        const earnings = (worker.totalHours * kitchenRate).toFixed(2);
-        kitchenSummary.innerHTML += `<p>${worker.worker}: ${worker.totalHours} hours, $${earnings} earned</p>`;
-    });
+    for (const worker in kitchenEarnings) {
+        kitchenSummary.innerHTML += `<p>${worker}: $${kitchenEarnings[worker].toFixed(2)} earned</p>`;
+    }
     summaryElement.appendChild(kitchenSummary);
-}
 
-function updateWeek() {
-    const weekStart = document.getElementById('weekStart').value;
-    fetchWeeklyHours(weekStart);
+    // ===> Insert the snippet here <===
+    // Calculate and display total earnings for barbecue and kitchen workers
+    const totalBarbecueEarnings = Object.values(barbecueEarnings).reduce((total, earning) => total + earning, 0);
+    const totalKitchenEarnings = Object.values(kitchenEarnings).reduce((total, earning) => total + earning, 0);
+
+    const totalBarbecueElement = document.createElement('p');
+    totalBarbecueElement.innerHTML = `<strong>Total Barbecue Earnings: $${totalBarbecueEarnings.toFixed(2)}</strong>`;
+    summaryElement.appendChild(totalBarbecueElement);
+
+    const totalKitchenElement = document.createElement('p');
+    totalKitchenElement.innerHTML = `<strong>Total Kitchen Earnings: $${totalKitchenEarnings.toFixed(2)}</strong>`;
+    summaryElement.appendChild(totalKitchenElement);
 }
