@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Hours Input</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
+        <h1 class="text-3xl font-bold mb-6 text-center text-blue-600">Enter Daily Hours</h1>
+        <div class="flex space-x-6">
+            <form id="hoursForm" class="space-y-6 w-2/3">
+                <div class="mb-6">
+                    <label for="date" class="block text-lg font-medium text-gray-700">Date</label>
+                    <input type="date" id="date" name="date" class="mt-2 p-3 w-full border rounded-md" required>
+                </div>
+                <div class="mb-6">
+                    <label for="foodSales" class="block text-lg font-medium text-gray-700">Food Sales</label>
+                    <input type="number" id="foodSales" name="foodSales" class="mt-2 p-3 w-full border rounded-md" required>
+                </div>
+                <div class="flex space-x-6">
+                    <div class="w-1/2">
+                        <h2 class="text-2xl font-semibold text-gray-700">Barbecue Workers</h2>
+                        <div id="barbecueWorkers" class="space-y-4">
+                            <div>
+                                <label for="hoursMariana" class="block text-gray-600">Mariana</label>
+                                <input type="number" id="hoursMariana" name="Mariana" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursLucas" class="block text-gray-600">Lucas</label>
+                                <input type="number" id="hoursLucas" name="Lucas" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursFilipe" class="block text-gray-600">Filipe</label>
+                                <input type="number" id="hoursFilipe" name="Filipe" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursAntonio" class="block text-gray-600">Antonio</label>
+                                <input type="number" id="hoursAntonio" name="Antonio" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursFernando" class="block text-gray-600">Fernando</label>
+                                <input type="number" id="hoursFernando" name="Fernando" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursMarco" class="block text-gray-600">Marco</label>
+                                <input type="number" id="hoursMarco" name="Marco" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursDani" class="block text-gray-600">Dani</label>
+                                <input type="number" id="hoursDani" name="Dani" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <h2 class="text-2xl font-semibold text-gray-700">Kitchen Workers</h2>
+                        <div id="kitchenWorkers" class="space-y-4">
+                            <div>
+                                <label for="hoursSidney" class="block text-gray-600">Sidney</label>
+                                <input type="number" id="hoursSidney" name="Sidney" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursJamile" class="block text-gray-600">Jamile</label>
+                                <input type="number" id="hoursJamile" name="Jamile" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursAna" class="block text-gray-600">Ana</label>
+                                <input type="number" id="hoursAna" name="Ana" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursTalita" class="block text-gray-600">Talita</label>
+                                <input type="number" id="hoursTalita" name="Talita" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursAlfonso" class="block text-gray-600">Alfonso</label>
+                                <input type="number" id="hoursAlfonso" name="Alfonso" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursLucasKitchen" class="block text-gray-600">Lucas</label>
+                                <input type="number" id="hoursLucasKitchen" name="LucasKitchen" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                            <div>
+                                <label for="hoursMarcoKitchen" class="block text-gray-600">Marco</label>
+                                <input type="number" id="hoursMarcoKitchen" name="MarcoKitchen" class="mt-1 p-2 w-full border rounded-md" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white p-3 rounded-md w-full mt-6">Submit Hours</button>
+            </form>
+            <div id="results" class="w-1/3 bg-gray-100 p-6 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold mb-4">Weekly Summary</h2>
+                <div class="mb-4">
+                    <label for="weekStart" class="block text-lg font-medium text-gray-700">Select Week Start</label>
+                    <input type="date" id="weekStart" name="weekStart" class="mt-2 p-3 w-full border rounded-md" required>
+                    <button onclick="updateWeek()" class="bg-blue-600 text-white p-3 rounded-md w-full mt-2">Update Week</button>
+                </div>
+                <div id="summary" class="space-y-4">
+                    <!-- Summary will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
