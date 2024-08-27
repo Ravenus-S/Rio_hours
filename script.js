@@ -8,6 +8,8 @@ document.getElementById('hoursForm').addEventListener('submit', function(event) 
     const barbecueWorkers = {
         Mariana: getValueOrDefault('hoursMariana'),
         Lucas: getValueOrDefault('hoursLucas'),
+        Vitor: getValueOrDefault('hoursVitor'),                // Vitor added
+        SidEspetador: getValueOrDefault('hoursSidEspetador'),  // Sid Espetador added
         Filipe: getValueOrDefault('hoursFilipe'),
         Antonio: getValueOrDefault('hoursAntonio'),
         Fernando: getValueOrDefault('hoursFernando'),
@@ -21,6 +23,7 @@ document.getElementById('hoursForm').addEventListener('submit', function(event) 
         Jamile: getValueOrDefault('hoursJamile'),
         Ana: getValueOrDefault('hoursAna'),
         Talita: getValueOrDefault('hoursTalita'),
+        Rafa: getValueOrDefault('hoursRafa'),                  // Rafa added
         Alfonso: getValueOrDefault('hoursAlfonso'),
         LucasKitchen: getValueOrDefault('hoursLucasKitchen'),
         MarcoKitchen: getValueOrDefault('hoursMarcoKitchen')
@@ -80,7 +83,6 @@ function updateSummary(barbecueEarnings, kitchenEarnings) {
     }
     summaryElement.appendChild(kitchenSummary);
 
-    // ===> Insert the snippet here <===
     // Calculate and display total earnings for barbecue and kitchen workers
     const totalBarbecueEarnings = Object.values(barbecueEarnings).reduce((total, earning) => total + earning, 0);
     const totalKitchenEarnings = Object.values(kitchenEarnings).reduce((total, earning) => total + earning, 0);
